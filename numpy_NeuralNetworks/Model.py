@@ -63,8 +63,11 @@ class Sequential:
                 progress = int((i+len(Y_hat)) * step)
                 print(f'\rEpoch {epoch+1}/{epochs}:\t' + '[' + '='*progress + '>' + '-'*(lenght - progress) +']', end='')
                 print(f' {i+len(Y_hat)}/{len(X)}', end='')
-
-            count = np.bincount(np.argmax(self.predict(X), axis=1) == np.argmax(Y, axis=1))
+            
+            try:
+                count = np.bincount(np.argmax(self.predict(X), axis=1) == np.argmax(Y, axis=1))
+            except np.exceptions.AxisError:
+                count = np.bincount(np.argmax(self.predict(X), axis=1) == Y)
             history['loss'].append(loss/(len(X)/batch_size))
             history['accuracy'].append(count[1]/len(X))
 
