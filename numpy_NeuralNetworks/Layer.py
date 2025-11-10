@@ -23,6 +23,7 @@ class Dense(Layer):
         super().__init__(output_shape, input_shape, activation)
         self.W = None
         self.b = None
+        self.built()
 
     def built(self):
         if self.build == False:
@@ -33,7 +34,6 @@ class Dense(Layer):
             self.build = True
 
     def forward(self, X):
-        self.built()
         self.X = X
         self.Z = np.dot(X, self.W) + self.b
         self.A = self.activation(self.Z)
@@ -52,10 +52,10 @@ class Dense(Layer):
 
         self.grad_W, self.grad_b = optimizer(dL_W, dL_b)
         assert self.grad_W.shape[0] == self.W.shape[0] and self.grad_W.shape[1] == self.W.shape[1]
-        self.W -= lr*self.grad_W
-        self.b -= lr*self.grad_b
+        # self.W -= lr*self.grad_W
+        # self.b -= lr*self.grad_b
 
-        return np.dot(self.dZ_X, dL_Z)
+        return np.dot(self.dZ_X, dL_Z), self.grad_W, self.grad_b
         
     def getOutput(self):
         return self.A

@@ -34,7 +34,7 @@ class Sequential:
     def backward(self, lr):
         dL_A = self.loss.deri
         for i in reversed(range(len(self.Layers))): 
-            dL_A = self.Layers[i].backward(dL_A, self.optimizer[i], lr)
+            dL_A, *grad = self.Layers[i].backward(dL_A, self.optimizer[i], lr)
 
     def compile(self, loss, optimizer):
         self.loss = loss
@@ -74,14 +74,26 @@ class Sequential:
             if val_data != None:
                 self.forward(val_data[0])
                 val_loss = self.loss(val_data[1], self.Layers[-1].getOutput())
-                val_count = np.bincount(np.argmax(self.predict(val_data[0]), axis=1) == np.argmax(val_data[1], axis=1))
-                val_evaluate = f' - loss: {val_loss:.4f} - accuracy: {val_count[1]/len(val_data[0]):.4f}'
+                try:
+                    val_count = np.bincount(np.argmax(self.predict(val_data[0]), axis=1) == np.argmax(val_data[1], axis=1))
+                except np.exceptions.AxisError:
+                    val_count = np.bincount(np.argmax(self.predict(val_data[0]), axis=1) == val_data[1])
+                val_evaluate = f' - val_loss: {val_loss:.4f} - val_accuracy: {val_count[1]/len(val_data[0]):.4f}'
                 history['val_loss'].append(val_loss)
                 history['val_accuracy'].append(val_count[1]/len(val_data[0])) 
 
             print(f' - loss: {history['loss'][-1]:.4f} - accuracy: {history['accuracy'][-1]:.4f}' + val_evaluate)
 
         return history
+    
+    def evaluate(X, Y):
+        try:
+            count = np.bincount(np.argmax(self.predict(X), axis=1) == np.argmax(Y, axis=1))
+        except np.exceptions.AxisError:
+            count = np.bincount(np.argmax(self.predict(X), axis=1) == Y)
+        
+        print("="*30 + "EVALUATION" + "="*30)
+        print(f"accuracy: {count[1]/len(X)}")
             
     def save_weights(self, path):
         if not os.path.exists(path):
@@ -99,8 +111,6 @@ class Sequential:
         if not os.path.exists(path):
             os.mkdir(path)
         os.chdir(path)
-
-        return
 
         for i, Layer in enumerate(self.Layers):
             with open(Layer.__class__.__name__ + f'{i}' + '.json', "w") as f:
