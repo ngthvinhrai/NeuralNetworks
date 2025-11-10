@@ -52,8 +52,8 @@ class Dense(Layer):
 
         self.grad_W, self.grad_b = optimizer(dL_W, dL_b)
         assert self.grad_W.shape[0] == self.W.shape[0] and self.grad_W.shape[1] == self.W.shape[1]
-        # self.W -= lr*self.grad_W
-        # self.b -= lr*self.grad_b
+        self.W -= lr*self.grad_W
+        self.b -= lr*self.grad_b
 
         return np.dot(self.dZ_X, dL_Z), self.grad_W, self.grad_b
         
