@@ -86,7 +86,7 @@ class Sequential:
 
         return history
     
-    def evaluate(X, Y):
+    def evaluate(self, X, Y):
         try:
             count = np.bincount(np.argmax(self.predict(X), axis=1) == np.argmax(Y, axis=1))
         except np.exceptions.AxisError:
