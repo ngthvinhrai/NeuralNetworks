@@ -555,11 +555,11 @@ class ModernLSTM(LSTM):
 #----------------------------------------------------------------------------------
 
 class Embedding(Layer):
-    def __init__(self, output_shape, input_shape=0, activation=Linear(), embedded=False, vocab_size=None, max_lenght=None, trainable=False):
+    def __init__(self, output_shape, input_shape=0, activation=Linear(), embedded=False, vocab_size=None, max_length=None, trainable=False):
         super().__init__(output_shape, input_shape, activation)
         self.embedded = embedded
         self.vocab_size = vocab_size
-        self.max_lenght = max_lenght
+        self.max_length = max_length
         self.trainable = trainable
 
     def built(self):
