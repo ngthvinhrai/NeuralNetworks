@@ -565,7 +565,7 @@ class Embedding(Layer):
 
     def built(self):
         if self.build == False:
-            self.E = cp.random.randn((self.input_shape, self.output_shape))
+            self.E = cp.random.randn(self.input_shape, self.output_shape)
             self.grad_E = cp.zeros_like(self.E)
             self.build = True
     
@@ -593,11 +593,12 @@ class Embedding(Layer):
     
     def backward(self, dL_A, optimizer, lr, gradient_norm=False):
         if self.trainable:
-            dL_Z = dL_A * self.activation.deri
-            dL_E = cp.dot(dL_E, self.X)
-            self.grad_E = optimizer(dL_E, norm=gradient_norm)
+            dL_Z = cp.expand_dims(dL_A, axis=1) * self.activation.deri
+            dL_E = np.einsum('pmb,bmn->pn', dL_Z, self.X)
 
-            self.E -= lr*(self.grad_E)
+            self.grad_E, = optimizer(dL_E, norm=gradient_norm)
+
+            self.E -= lr*self.grad_E
 
     def getOutput(self):
         return self.A

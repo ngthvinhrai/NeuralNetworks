@@ -3,7 +3,7 @@ import cupy as cp
 
 class GradientDescent:
     def __call__(self, *weights, norm=False):
-        if norm: return [weight.T/cp.linalg.norm(weight.T) for weight in weights]
+        if norm: return [weight.T/cp.linalg.norm(weight.T + 1e-5, axis=0) for weight in weights]
         else: return [weight.T for weight in weights]
     
 class Momentum:
@@ -15,7 +15,9 @@ class Momentum:
         if self.v is None:
             self.v = [cp.zeros(weight.T.shape) for weight in weights]
         self.v = [self.beta * v + (1 - self.beta) * weight.T for v, weight in zip(self.v, weights)]
-        return self.v
+        
+        if self.norm: return [v/cp.linalg.norm(v + 1e-5, axis=0) for v in self.v]
+        else: return self.v
     
 if __name__ == '__main__':
     X = cp.array([[1,2,3],[4,5,6]])

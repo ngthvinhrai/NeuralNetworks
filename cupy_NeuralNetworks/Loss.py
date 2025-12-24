@@ -28,6 +28,16 @@ class CrossEntropy(Loss):
         self.deri = (-Y.T/(Y_hat.T + 1e-3))/N
 
         return self.loss
+        
+class SpareCrossEntropy(Loss):
+    def __call__(self, Y, Y_hat):
+        N = Y.shape[0]
+        self.loss = -cp.log(Y_hat[cp.arange(N), Y] + 1e-5).sum()/N
+        self.deri = cp.zeros_like(Y_hat)
+        self.deri[cp.arange(N), Y] = -1/(Y_hat[np.arange(N), Y] + 1e-5)/N
+        self.deri = self.deri.T
+
+        return self.loss
     
 if __name__ == '__main__':
     # Y = cp.array([[1,0,0], [0,0,1]])
